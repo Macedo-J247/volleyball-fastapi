@@ -1,6 +1,20 @@
+from fastapi import FastAPI
+import uvicorn
+
+
+admin = FastAPI(title="VolleyManager")
+
+
+@admin.get("/")
+def home():
+    return {
+        "Mensagem": "API funcional e operante!"
+    }
+
+
 def main():
-  print('Hello, World!')
+    uvicorn.run('main:admin', host='127.0.0.1', port=8000, reload=True)
 
 
 if __name__ == '__main__':
-  main()
+    main()
