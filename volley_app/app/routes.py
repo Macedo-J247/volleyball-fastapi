@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from typing import Literal
+from ..app import models
 
 
 manager = FastAPI(title="VolleyballManager")
@@ -6,7 +8,13 @@ manager = FastAPI(title="VolleyballManager")
 # Endpoints destinados à administração dos jogadores no sistema.
 
 @manager.get("/jogador")
-def get_jogador():
+def get_jogador(
+    nome: str,
+    email:str,
+    sexo: str,
+    idade: int,
+    categoria: Literal['', '', '']
+):
     # Descrição - Essa função cria um novo perfil (ID) para um jogador(a).
     return {
         "id_do_jogador": "mensagem"
@@ -25,7 +33,10 @@ def get_id_jogador():
     }
 
 @manager.put("/jogador/{id}")
-def put_id_jogador():
+def put_id_jogador(
+    nome: str,
+    categoria: Literal['', '', '']
+):
     # Descrição - Essa função atualiza os dados de um jogador(a) com base no ID existente no sistema.
     return {
         "id_do_jogador": "mensagem"
@@ -34,7 +45,15 @@ def put_id_jogador():
 # Endpoints destinados à administração das partidas no sistema.
 
 @manager.post("/partida")
-def post_partida():
+def post_partida(
+    id_jogador_organizador: int,
+    local: str,
+    data: str,
+    hora: str,
+    categoria: Literal['', '', ''],
+    tipo: str,
+    status: bool
+):
     # Descrição - Essa função cria uma nova partida (de vôlei em questão) no sistema.
     return {
         "id_da_partida": "mensagem"
@@ -68,29 +87,37 @@ def get_id_partida():
     }
 
 @manager.put("/partida/{id}")
-def put_id_partida():
+def put_id_partida(
+    status: bool
+):
     # Descrição - Essa função atualiza os dados de uma partida (de vôlei) existente no sistema.
     return {
-        "mensagem": "status"
+        "mensagem": status
     }
 
 @manager.post("/partida/{id}/adesao")
-def post_aderir_id_partida():
+def post_aderir_id_partida(
+    id_jogador: int
+):
     # Descrição - Essa função emite um pedido de adesão de um(a) jogador(a) à uma partida (de vôlei) existente no sistema.
     return {
         "mensagem": "status"
     }
 
 @manager.put("/partida/{id}/adesao/{id}")
-def put_aderir_id_partida():
+def put_aderir_id_partida(
+    status: bool
+):
     # Descrição - Essa função emite a resposta do(a) jogador(a) organizador(a) de uma partida (de vôlei)
     # sobre o pedido de adesão de um jogador(a).
     return {
-        "id_jogador_organizador": "status"
+        "id_jogador_organizador": status
     }
 
 @manager.post("/partida/{id}/desistencia")
-def post_desistir_id_partida():
+def post_desistir_id_partida(
+    id_jogador: int
+):
     # Descrição - Essa função registra a desistência de um jogador(a) de uma partida (de vôlei) existente no sistema.
     return {
         "mensagem": "mensagem"
@@ -99,7 +126,13 @@ def post_desistir_id_partida():
 # Endpoints
 
 @manager.post("/avaliacoes")
-def post_avaliacao():
+def post_avaliacao(
+    id_avaliador: int,
+    id_avaliado: int,
+    id_partida: int,
+    nota: int,
+    comentario: str = ''
+):
     # Descrição - Essa função registra a avaliação feita por um(a) jogador(a) para a partida (de vôlei)
     # e/ou aos jogadores(as) que estavam presentes
     return {
