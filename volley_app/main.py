@@ -1,9 +1,7 @@
-from fastapi import FastAPI
+from app import routes
 import uvicorn
 
-
-admin = FastAPI(title="VolleyManager")
-
+admin = routes.manager
 
 @admin.get("/")
 def home():
