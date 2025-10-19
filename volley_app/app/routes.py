@@ -1,138 +1,117 @@
-from fastapi import FastAPI
-from typing import Literal
+from fastapi import FastAPI, HTTPException, status
+from typing import List, Literal, Optional
+from app import database
 
 
 manager = FastAPI(title="VolleyballManager")
 
 # Endpoints destinados à administração dos jogadores no sistema.
 
-@manager.get("/jogador")
-def get_jogador(
-    nome: str,
-    email:str,
-    sexo: str,
-    idade: int,
-    categoria: Literal['', '', '']
-):
+@manager.post("/jogador", response_model=database.Jogador, status_code=status.HTTP_201_CREATED)
+def criar_jogador(jogador: database.Jogador):
     # Descrição - Essa função cria um novo perfil (ID) para um jogador(a).
-    return {
-        "id_do_jogador": "mensagem"
-    }
+    if any(j.id_number == jogador.id_number for j in database.jogadores):
+        raise HTTPException(status_code=400, detail="Jogador já cadastrado no sistema.")
+    database.jogadores.append(jogador)
+    return jogador
 
-@manager.get("/jogador/{id_jogador}")
-def get_id_jogador():
-    # Descrição - Essa função busca o perfi de um jogador(a) com base no ID existente no sistema.
-    return {
-        "id_do_jogador": "id_jogador",
-        "nome_do_jogador": "nome",
-        "email_do_jogador": "email",
-        "sexo_do_jogador": "sexo",
-        "idade_do_jogador": "idade",
-        "categoria_do_jogador": "categoria"
-    }
+@manager.get("/jogador", response_model=List[database.Jogador])
+def listar_jogadores():
+    # Descrição - Essa função busca todos os jogadores(as) existente no sistema.
+    return database.jogadores
 
-@manager.put("/jogador/{id_jogador}")
-def put_id_jogador(
-    nome: str,
-    categoria: Literal['', '', '']
-):
+@manager.get("/jogador/{id_jogador}", response_model=database.Jogador)
+def get_id_jogador(id_jogador: int):
+    for jogador in database.jogadores:
+        if jogador.id_number == id_jogador:
+            return jogador
+    raise HTTPException(status_code=404, detail="Jogador não encontrado.")
+
+@manager.put("/jogador/{id_jogador}", response_model=database.Jogador)
+def put_id_jogador(id_jogador: int, nome: Optional[str] = None, categoria: Optional[str] = None):
     # Descrição - Essa função atualiza os dados de um jogador(a) com base no ID existente no sistema.
-    return {
-        "id_do_jogador": "mensagem"
-    }
+    for jogador in database.jogadores:
+        if jogador.id_number == id_jogador:
+            if nome:
+                jogador.nome = nome
+            if categoria:
+                jogador.categoria = categoria
+            return jogador
+    raise HTTPException(status_code=404, detail="Jogador não encontrado.")
 
 # Endpoints destinados à administração das partidas no sistema.
 
-@manager.post("/partida")
-def post_partida(
-    id_jogador_organizador: int,
-    local: str,
-    data: str,
-    hora: str,
-    categoria: Literal['', '', ''],
-    tipo: str,
-    status: bool
-):
+@manager.post("/partida", response_model=database.Partida, status_code=status.HTTP_201_CREATED)
+def post_partida(partida: database.Partida):
     # Descrição - Essa função cria uma nova partida (de vôlei em questão) no sistema.
-    return {
-        "id_da_partida": "mensagem"
-    }
+    if any(p.id_number == partida.id_number for p in database.partidas):
+        raise HTTPException(status_code=400, detail="Partida já cadastrada no sistema.")
+    database.partidas.append(partida)
+    return partida
 
-@manager.get("/partida")
+@manager.get("/partida", response_model=List[database.Partida])
 def get_partida():
     # Descrição - Essa função lista todas as partidas (de vôlei) existentes no sistema.
-    return {
-        "id_organizador_partida": "id_jogador",
-        "local_da_partida": "local_partida",
-        "data_da_partida": "data_partida",
-        "hora_da_partida": "hora_partida",
-        "categoria_da_partida": "categoria_partida",
-        "tipo_da_partida": "tipo_partida",
-        "status_da_partida": "status"
-    }
+    return database.partidas
 
-@manager.get("/partida/{id_partida}")
-def get_id_partida():
+@manager.get("/partida/{id_partida}", response_model=database.Partida)
+def get_id_partida(id_partida: int):
     # Descrição - Essa função exibe os detalhes de uma partida (de vôlei) existente no sistema.
-    return {
-        "id_partida_existente": "id_partida",
-        "id_jogador_organizador": "id_jogador",
-        "local_da_partida": "local_partida",
-        "data_da_partida": "data_partida",
-        "hora_da_partida": "hora_partida",
-        "categoria_da_partida": "categoria_partida",
-        "tipo_da_partida": "tipo_partida",
-        "status_da_partida": "status"
-    }
+    for partida in database.partidas:
+        if partida.id_number == id_partida:
+            return partida
+    raise HTTPException(status_code=404, detail="Partida n]ao encontrada no sistema.")
 
-@manager.put("/partida/{id_partida}")
-def put_id_partida(status: bool):
+@manager.put("/partida/{id_partida}", response_model=database.Partida)
+def put_id_partida(id_partida: int, status: str):
     # Descrição - Essa função atualiza os dados de uma partida (de vôlei) existente no sistema.
-    return {
-        "mensagem": status
-    }
+    for partida in database.partidas:
+        if partida.id_number == id_partida:
+            partida.status = status
+            return partida
+    raise HTTPException(status_code=404, detail="Partida não encontrada no sistema.")
 
-@manager.post("/partida/{id_partida}/adesao")
-def post_aderir_id_partida(id_jogador: int):
+# Endpoints destinados à adesões de jogadores em partidas (de vôlei)
+
+@manager.post("/partida/{id_partida}/adesao", response_model=database.Adesao)
+def post_aderir_id_partida(id_partida: int, adesao: database.Adesao):
     # Descrição - Essa função emite um pedido de adesão de um(a) jogador(a) à uma partida (de vôlei) existente no sistema.
-    return {
-        "mensagem": "status"
-    }
+    if not any(p.id_number == id_partida for p in database.partidas):
+        raise HTTPException(status_code=404, detail="Partida não encontrada no sistema.")
+    database.adesoes.append(adesao)
+    return adesao
 
-@manager.put("/partida/{id_partida}/adesao/{id_adesao}")
-def put_aderir_id_partida(status: bool):
+@manager.put("/partida/{id_partida}/adesao/{id_adesao}", response_model=database.Adesao)
+def put_aderir_id_partida(id_partida: int, id_adesao: int, status: str):
     # Descrição - Essa função emite a resposta do(a) jogador(a) organizador(a) de uma partida (de vôlei)
     # sobre o pedido de adesão de um jogador(a).
-    return {
-        "id_jogador_organizador": status
-    }
+    for adesao in database.adesoes:
+        if adesao.id_number == id_adesao and adesao.id_partida == id_partida:
+            adesao.status = status
+            return adesao
+    raise HTTPException(status_code=404, detail="Pedido de adesão não encontrada no sistema.")
 
 @manager.post("/partida/{id_partida}/desistencia")
-def post_desistir_id_partida(id_jogador: int):
+def post_desistir_id_partida(id_partida: int, id_jogador: int):
     # Descrição - Essa função registra a desistência de um jogador(a) de uma partida (de vôlei) existente no sistema.
-    return {
-        "mensagem": "mensagem"
-    }
+    for adesao in database.adesoes:
+        if adesao.id_partida == id_partida and adesao.id_jogador == id_jogador:
+            database.adesoes.remove(adesao)
+            return {
+                "Mensagem": "Jogador desistiu da partida."
+            }
+    raise HTTPException(status_code=404, detail="Pedido de adesão não encontrada no sistema.")
 
-# Endpoints
+# Endpoints destinados à avaliações
 
-@manager.post("/avaliacoes")
-def post_avaliacao(
-    id_avaliador: int,
-    id_avaliado: int,
-    id_partida: int,
-    nota: int,
-    comentario: str = ''
-):
+@manager.post("/avaliacoes", response_model=database.Avaliacao, status_code=status.HTTP_201_CREATED)
+def post_avaliacao(avaliacao: database.Avaliacao):
     # Descrição - Essa função registra a avaliação feita por um(a) jogador(a) para a partida (de vôlei)
     # e/ou aos jogadores(as) que estavam presentes
-    return {
-        "id_da_avaliação": "mensagem"
-    }
+    database.avaliacoes.append(avaliacao)
+    return avaliacao
 
-@manager.get("/avaliacoes")
+@manager.get("/avaliacoes", response_model=List[database.Avaliacao])
 def get_avaliacoes():
     # Descrição - Essa função lista todas as avaliações feitas para as partidas (de vôlei) existentes no sistema.
-    return {
-        "id_das_avaliações": "avaliações"
-    }
+    return database.avaliacoes
