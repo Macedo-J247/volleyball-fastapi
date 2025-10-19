@@ -11,8 +11,8 @@ manager = FastAPI(title="VolleyballManager")
 @manager.post("/jogador", response_model=database.Jogador, status_code=status.HTTP_201_CREATED)
 def criar_jogador(jogador: database.Jogador):
     # Descrição - Essa função cria um novo perfil (ID) para um jogador(a).
-    if any(j.id_number == jogador.id_number for j in database.jogadores):
-        raise HTTPException(status_code=400, detail="Jogador já cadastrado no sistema.")
+    novo_id = 1 if not database.jogadores else max(j.id_number for j in database.jogadores) + 1    
+    jogador.id_number = novo_id
     database.jogadores.append(jogador)
     return jogador
 

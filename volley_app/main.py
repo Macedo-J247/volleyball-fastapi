@@ -56,6 +56,61 @@ def home():
             </div>
 
             <div class="card">
+                <h2> Jogadores </h2>
+
+                <label> Nome: </label>
+                <input>
+                <br>
+
+                <label> Idade: </label>
+                <input>
+                <br>
+
+                <label> Sexo: </label>
+                <select id="sexo">
+                    <option value="Masculino"> Masculino </option>
+                    <option value="Feminino"> Feminino </option>
+                    <option value="Não Informar"> Não Informar </option>
+                </select>
+                <br>
+
+                <label> Email </label>
+                <input id="idade" type="number">
+                <br>
+
+                <label> Categoria </label>
+                <select id="categoria">
+                    <option value=""> Selecione </option>
+                    <option value="Novato"> Novato </option>
+                    <option value="Amador"> Amador </option>
+                    <option value="Profissional"> Profissional </option>
+                </select>
+                <br>
+
+                <button>
+                <button>
+                <ul></ul>
+            </div>
+
+            <div class="card">
+                <h2> Partidas </h2>
+
+
+            </div>
+
+            <div class="card">
+                <h2> Adesões </h2>            
+            
+                
+            </div>
+
+            <div class="card">
+                <h2> Avaliações </h2>
+            
+                
+            </div>
+
+            <div class="card">
                 <h2> Documentação da API: </h2>
                 <ul>
                     <li>
@@ -66,6 +121,18 @@ def home():
                     </li>
                 </ul>
             </div>
+
+            <script>
+                const API = "http://127.0.0.1:8000";
+
+                async function criar_jogador()
+                {
+                    const jogador = {
+                        id_number: Date.now(),
+
+                    };
+                }
+            </script>
         </body>
     </html>
     """
